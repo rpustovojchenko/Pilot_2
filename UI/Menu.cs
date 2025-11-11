@@ -1,15 +1,17 @@
-﻿namespace Game.UI;
+﻿using Game.Properties;
+
+namespace Game.UI;
 
 internal class Menu
 {
     private string[] _items;
 
-    public Menu(string[] items)
+    public Menu()
     {
-        _items = items;
+        _items = GetMenuItems();
     }
 
-    public void UpdateItems(string[] items) =>_items = items;
+    public void UpdateItems(string[] items) => _items = items;
 
     public int ShowMenu(string title)
     {
@@ -42,4 +44,7 @@ internal class Menu
             }
         }
     }
+
+    public string[] GetMenuItems() =>
+        [Res.Play, Res.Rules, Res.ChooseName, Res.Language, Res.Exit];
 }

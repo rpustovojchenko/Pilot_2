@@ -9,7 +9,8 @@ internal class WordValidator
 {
     public static bool IsStartWordValid(string word)
     {
-        if (!(word.Length >= GameConstants.MinStartWordLength && word.Length <= GameConstants.MaxStartWordLength))
+        if (!(word.Length >= GameConstants.MinStartWordLength 
+            && word.Length <= GameConstants.MaxStartWordLength))
         {
             Printer.PrintError($"\n{Res.StartWordLenError}\n");
             return false;
@@ -27,12 +28,10 @@ internal class WordValidator
         return true;
     }
 
-    public static bool IsPlayerWordValid(
-        string word,
+    public static bool IsPlayerWordValid(string word,
         string startWord,
         in Dictionary<char, int> letterCounts,
-        in LinkedList<string> usedWords
-        )
+        in LinkedList<string> usedWords)
     {
         if (string.IsNullOrEmpty(word))
         {

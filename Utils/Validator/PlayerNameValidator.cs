@@ -15,7 +15,7 @@ internal class PlayerNameValidator
 
         foreach (var ch in name)
         {
-            if (!char.IsLetter(ch) && !(ch == ' '))
+            if (!char.IsLetter(ch) && !(ch == ' ') && !char.IsDigit(ch))
             {
                 Printer.PrintError($"\n{Res.NotLettersError}\n");
                 return false;

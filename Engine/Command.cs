@@ -31,7 +31,7 @@ internal class Command
     {
         Printer.PrintCommand(string.Format("{0,-20} {1,-5}\n", Res.Player, Res.Score));
         foreach (var score in ScoreManager.GetScores())
-            if (score.FirstPlayer == player.AllPlayers[0] && score.SecondPlayer == player.AllPlayers[1])
+            if (score.Player == player.AllPlayers[0] || score.Player == player.AllPlayers[1])
                 PrintScore(score);
     }
 
@@ -42,9 +42,6 @@ internal class Command
             PrintScore(score);
     }
 
-    private static void PrintScore(Score score)
-    {
-        Printer.PrintCommand(string.Format("{0,-20} {1,-5}", score.FirstPlayer, score.FirstPlayerScore));
-        Printer.PrintCommand(string.Format("{0,-20} {1,-5}\n", score.SecondPlayer, score.SecondPlayerScore));
-    }
+    private static void PrintScore(Score score) =>
+        Printer.PrintCommand(string.Format("{0,-20} {1,-5}\n", score.Player, score.PlayerScore));
 }

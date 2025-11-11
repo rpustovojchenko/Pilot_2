@@ -1,6 +1,5 @@
 ﻿using Game.Properties;
 using Game.Data;
-using Game.Data.Models;
 using Game.UI;
 using Game.Utils.Lokalization;
 
@@ -10,12 +9,13 @@ namespace Game.Engine;
 internal class Game
 {
     private PlayerManager _playerManager;
-    private WordManager   _wordManager;
-    private ScoreManager  _scoreManager;
-    private Menu          _menu;
-    private Language      _language;
-                          
-    private string?       _lastPlayer;
+    private WordManager _wordManager;
+    private ScoreManager _scoreManager;
+    private Menu _menu;
+    private Language _language;
+    private bool _isGameEnd;
+
+    private string? _lastPlayer;
 
     public Game()
     {
@@ -23,7 +23,8 @@ internal class Game
         _playerManager = new();
         _wordManager = new();
         _scoreManager = new(JSON.Deserialize());
-        _menu = new(GetMenuItems());
+        _menu = new();
+        _isGameEnd = true;
 
         AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
     }
@@ -39,8 +40,9 @@ internal class Game
                 case 0: PlayGame(); break;
                 case 1: MenuOptions.PrintRules(); break;
                 case 2: MenuOptions.ChoosePlayerName(_playerManager); break;
-                case 3: MenuOptions.ChooseLanguage(_menu, _language);
-                    _menu.UpdateItems(GetMenuItems());
+                case 3:
+                    MenuOptions.ChooseLanguage(_menu, _language);
+                    _menu.UpdateItems(_menu.GetMenuItems());
                     break;
                 case 4: return;
             }
@@ -52,11 +54,14 @@ internal class Game
 
     private void PlayGame()
     {
+        _isGameEnd = false;
         _playerManager.SetNames();
 
-        Score score = new();
-        score.SetPlayers(_playerManager.AllPlayers);
-        _scoreManager.UpdateOrCreate(score);
+        var (FirstPlayerScore, SecondPlayerScore) =
+            _scoreManager.CreateScoresForPlayers(_playerManager.AllPlayers);
+
+        _scoreManager.CreateScore(FirstPlayerScore);
+        _scoreManager.CreateScore(SecondPlayerScore);
 
         Printer.Clear();
         Printer.Print($"{_playerManager.CurrentPlayer} {Res.EnterStartWord}");
@@ -96,26 +101,28 @@ internal class Game
             _playerManager.SwitchPlayer();
         }
 
+        _isGameEnd = true;
+
         _playerManager.SwitchPlayer();
         Printer.PrintSuccess($"\n{Res.Won} {_playerManager.CurrentPlayer} {Res.WonEn}!\n");
 
-        score.SetWinner(_playerManager.CurrentPlayer);
-        _scoreManager.UpdateOrCreate(score);
+        _scoreManager.UpdateScore(_playerManager.CurrentPlayer, FirstPlayerScore,
+            SecondPlayerScore, _playerManager.AllPlayers);
 
         _playerManager.ResetPlayer();
     }
 
     private void OnProcessExit(object? sender, EventArgs e)
     {
+        if (_isGameEnd) return;
+
         if (!string.IsNullOrEmpty(_lastPlayer))
         {
-            Score score = new();
-            score.SetPlayers(_playerManager.AllPlayers);
-            score.SetWinner(_lastPlayer);
-            _scoreManager.UpdateOrCreate(score);
+            var (FirstPlayerScore, SecondPlayerScore) =
+                _scoreManager.CreateScoresForPlayers(_playerManager.AllPlayers);
+
+            _scoreManager.UpdateScore(_lastPlayer, FirstPlayerScore,
+                SecondPlayerScore, _playerManager.AllPlayers);
         }
     }
-
-    private string[] GetMenuItems() =>
-        [ Res.Play, Res.Rules, Res.ChooseName, Res.Language, Res.Exit ];
 }

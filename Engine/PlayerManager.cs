@@ -32,8 +32,8 @@ internal class PlayerManager
     public void UpdatePlayersName(string name1, string name2)
     {
         IsDefaultNames = false;
-        AllPlayers[0] = name1;
-        AllPlayers[1] = name2;
+        AllPlayers[0] = name1.Trim();
+        AllPlayers[1] = name2.Trim();
         ChangePlayer();
     }
 
